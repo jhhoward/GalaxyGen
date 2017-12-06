@@ -51,7 +51,8 @@ namespace GalaxyGen
             Family,
         }
 
-        public string name;
+        public string displayName;
+        public string baseName;
         public RegionId id { get; private set; }
         public int colorIndex { get; private set; }
         public int languageIndex { get; private set; }

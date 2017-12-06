@@ -25,7 +25,7 @@ namespace GalaxyGen
 
             int numRegions = random.Range(5, 10);
 
-            for(int n = 0; n < numRegions; n++)
+            for (int n = 0; n < numRegions; n++)
             {
                 RegionId id = new RegionId(cellX, cellY, n);
                 Region region = new Region(id, random);
@@ -34,9 +34,15 @@ namespace GalaxyGen
 
             ConstrainPositions();
 
+            NameRegions(random);
+        }
+
+        void NameRegions(Rand64 random)
+        { 
             for(int n = 0; n < regions.Count; n++)
             {
-                regions[n].name = generator.GenerateName(regions[n].languageIndex, random);
+                regions[n].baseName = generator.GenerateName(regions[n].languageIndex, random);
+                regions[n].displayName = generator.GenerateRegionName(regions[n].baseName, random);
             }
         }
 

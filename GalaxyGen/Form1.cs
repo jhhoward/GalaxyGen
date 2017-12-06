@@ -12,6 +12,12 @@ namespace GalaxyGen
 {
     public partial class Form1 : Form
     {
+        GalaxyGenerator galaxyGenerator
+        {
+            get { return renderer.galaxyGenerator; }
+        }
+
+
         int dragX = 0, dragY = 0;
         bool draggingView = false;
         public Form1()
@@ -25,10 +31,6 @@ namespace GalaxyGen
             hScrollBar1.Maximum = (GalaxyGenerator.galaxySize * renderer.cellSize);
             vScrollBar1.Maximum = (GalaxyGenerator.galaxySize * renderer.cellSize);
 
-            Rand64 rand = new Rand64((ulong)new Random().Next());
-            hScrollBar1.Value = rand.Range(0, hScrollBar1.Maximum);
-            vScrollBar1.Value = rand.Range(0, vScrollBar1.Maximum);
-
             vScrollBar1.Scroll += (sender, e) => { MainPictureBox.Invalidate(); };
             hScrollBar1.Scroll += (sender, e) => { MainPictureBox.Invalidate(); };
 
@@ -39,6 +41,18 @@ namespace GalaxyGen
             MainPictureBox.MouseUp += View_MouseUp;
             MainPictureBox.MouseMove += View_MouseMove;
             MainPictureBox.MouseWheel += View_MouseWheel;
+
+
+            Rand64 rand = new Rand64((ulong)new Random().Next());
+            int cellX = rand.Range(0, GalaxyGenerator.galaxySize);
+            int cellY = rand.Range(0, GalaxyGenerator.galaxySize);
+            GalaxyCell cell = galaxyGenerator.GetCell(cellX, cellY);
+            if(cell != null)
+            {
+                StarSystem chosenSystem = cell.starSystems[rand.Range(0, cell.starSystems.Count)];
+                SelectSystem(chosenSystem);
+                CenterOnSystem(chosenSystem);
+            }
         }
 
         private void View_MouseWheel(object sender, MouseEventArgs e)
@@ -74,7 +88,55 @@ namespace GalaxyGen
 
         private void View_MouseClick(object sender, MouseEventArgs e)
         {
+            if(e.Button == MouseButtons.Left)
+            {
+                float pickX = (float)(e.X + renderer.scrollX) / renderer.cellSize;
+                float pickY = (float)(e.Y + renderer.scrollY) / renderer.cellSize;
 
+                GalaxyCell cell = galaxyGenerator.GetCell((int)pickX, (int)pickY);
+
+                if (cell != null)
+                {
+                    pickX -= (int)pickX;
+                    pickY -= (int)pickY;
+
+                    foreach (StarSystem system in cell.starSystems)
+                    {
+                        if (Math.Abs(system.x - pickX) < 0.05f && Math.Abs(system.y - pickY) < 0.05f)
+                        {
+                            SelectSystem(system);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        void CenterOnSystem(StarSystem system)
+        {
+            int newX = (int)(((system.id.cellX + system.x) * renderer.cellSize) - MainPictureBox.Width / 2);
+            int newY = (int)(((system.id.cellY + system.y) * renderer.cellSize) - MainPictureBox.Height / 2);
+
+            hScrollBar1.Value = Math.Max(0, Math.Min(newX, hScrollBar1.Maximum));
+            vScrollBar1.Value = Math.Max(0, Math.Min(newY, vScrollBar1.Maximum));
+        }
+
+        void SelectSystem(StarSystem system)
+        {
+            renderer.selectedSystem = system.id;
+
+            Region region = galaxyGenerator.GetRegion(system.regionId);
+
+            string description = "";
+
+            description += "Selected system:" + Environment.NewLine;
+            description += system.name + Environment.NewLine;
+            description += "Allegiance:" + Environment.NewLine;
+            description += region.displayName + Environment.NewLine;
+
+            textBox1.Text = description;
+
+            Refresh();
         }
 
         private void View_MouseMove(object sender, MouseEventArgs e)

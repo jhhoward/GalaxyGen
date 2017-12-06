@@ -10,6 +10,8 @@ namespace GalaxyGen
 {
     public class GalaxyRenderer
     {
+        public StarSystemId selectedSystem;
+
         public float zoom = 1.0f;
         public int scrollX = 200;
         public int scrollY = 200;
@@ -22,7 +24,7 @@ namespace GalaxyGen
         }
 
 
-        GalaxyGenerator galaxyGenerator;
+        public GalaxyGenerator galaxyGenerator;
         public GalaxyRenderer()
         {
             galaxyGenerator = new GalaxyGenerator();
@@ -127,6 +129,11 @@ namespace GalaxyGen
                 else
                 {
                     gfx.FillRectangle(systemColor, x - 1, y - 1, 3, 3);
+                }
+
+                if(star.id == selectedSystem)
+                {
+                    gfx.DrawRectangle(Pens.White, x - 10, y - 10, 20, 20);
                 }
 
                 if (zoom > 0.6f)

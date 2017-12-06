@@ -28,6 +28,31 @@ namespace GalaxyGen
             "{0} Town",
         };
 
+        string[] regionNamingRules =
+        {
+            "{0} Empire",
+            "{0} Kingdom",
+            "{0} Federation",
+            "House of {0}",
+            "{0} Union",
+            "{0} Corporation",
+            "{0} Republic",
+            "{0} Family",
+            "Great {0}",
+            "United Planets of {0}",
+            "{0} Alliance",
+            "{0} District",
+            "League of {0}",
+            "{0} Coalition",
+            "{0} Association",
+            "{0} Consortium",
+            "{0} Dynasty",
+            "{0} Commonwealth",
+            "{0} Province",
+            "{0} Dominion",
+            "{0} Faction",
+            "{0} Nation",
+        };
 
         public GalaxyGenerator()
         {
@@ -115,7 +140,7 @@ namespace GalaxyGen
 
         public string GenerateCapitalName(Region region, Rand64 random)
         {
-            string baseName = region.name;
+            string baseName = region.baseName;
 
             if(random.Range(0.0f, 1.0f) < 0.5f)
             {
@@ -127,6 +152,12 @@ namespace GalaxyGen
                 return string.Format(nameFormat, baseName);
             }
             return baseName;
+        }
+
+        public string GenerateRegionName(string baseName, Rand64 random)
+        {
+            string nameFormat = regionNamingRules[random.Range(0, regionNamingRules.Length)];
+            return string.Format(nameFormat, baseName);
         }
     }
 }
